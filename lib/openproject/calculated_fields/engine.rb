@@ -6,7 +6,7 @@ module OpenProject
         include OpenProject::Plugins::ActsAsOpEngine
   
         register 'openproject-calculated-fields',
-                 author_url: 'https://github.com/example',
+                 author_url: 'https://github.com/prgarg007',
                  bundled: false
   
         patches %i[CustomField WorkPackage]
