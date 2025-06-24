@@ -13,7 +13,7 @@ Gem::Specification.new do |s|
   s.license     = "GPLv3"
 
   s.files = Dir["{app,config,db,lib}/**/*", "README.md"]
-  s.add_dependency "openproject-plugins", "~> 1.0"
+  # s.add_dependency "openproject-plugins", "~> 1.0"
   
   # Add any other dependencies your plugin needs
 end
