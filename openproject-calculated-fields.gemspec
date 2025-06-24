@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require_relative "lib/openproject/calculated_fields/version"
 
 Gem::Specification.new do |s|
-  s.name        = "openproject-calculated_fields-fields"
+  s.name        = "openproject-calculated-fields"
   s.version     = "1.0"
   s.authors     = ["Pranav Garg"]
   s.email       = ["pranavgarg37@gmail.com"]
