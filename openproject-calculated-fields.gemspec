@@ -1,6 +1,6 @@
 # openproject-calc-fields.gemspec
 $:.push File.expand_path("../lib", __FILE__)
-require 'openproject/calculated_fields/version'
+require_relative "lib/openproject/calculated_fields/version"
 
 Gem::Specification.new do |s|
   s.name        = "openproject-calculated_fields-fields"
