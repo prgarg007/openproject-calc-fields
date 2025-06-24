@@ -4,7 +4,7 @@ require_relative "lib/openproject/calculated_fields/version"
 
 Gem::Specification.new do |s|
   s.name        = "openproject-calculated_fields-fields"
-  s.version     = OpenProject::CalcFields::VERSION
+  s.version     = OpenProject::VERSION
   s.authors     = ["Pranav Garg"]
   s.email       = ["pranavgarg37@gmail.com"]
   s.homepage    = "https://github.com/prgarg007/openproject-calc-fields"
