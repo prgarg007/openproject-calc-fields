@@ -1,0 +1,214 @@
+<%
+content_for :header_tags do
+  stylesheet_link_tag 'calculated_fields', plugin: 'openproject-calculated-fields'
+end
+%>
+
+<%= toolbar title: t(:label_calculated_custom_fields) do %>
+  <%= link_to new_admin_calculated_custom_field_path,
+              class: 'button -alt-highlight',
+              accesskey: accesskey(:new) do %>
+    <%= op_icon('button--icon icon-add') %>
+    <span class="button--text"><%= t(:label_new_calculated_field) %></span>
+  <% end %>
+<% end %>
+
+<div class="generic-table--container">
+  <div class="generic-table--results-container">
+    <table class="generic-table">
+      <colgroup>
+        <col opHighlightCol>
+        <col opHighlightCol>
+        <col opHighlightCol>
+        <col opHighlightCol>
+        <col opHighlightCol>
+        <col>
+      </colgroup>
+      <thead>
+        <tr>
+          <th><%= t(:field_name) %></th>
+          <th><%= t(:label_formula) %></th>
+          <th><%= t(:label_output_type) %></th>
+          <th><%= t(:field_active) %></th>
+          <th><%= t(:field_created_on) %></th>
+          <th><div class="generic-table--empty-header"></div></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @calculated_custom_fields.each do |calc_field| %>
+          <tr>
+            <td>
+              <%= link_to calc_field.custom_field.name,
+                          edit_admin_calculated_custom_field_path(calc_field) %>
+            </td>
+            <td>
+              <code class="formula-preview"><%= truncate(calc_field.formula, length: 50) %></code>
+            </td>
+            <td>
+              <span class="badge"><%= calc_field.output_type.humanize %></span>
+            </td>
+            <td>
+              <%= calc_field.active? ? t(:general_text_yes) : t(:general_text_no) %>
+            </td>
+            <td><%= format_date(calc_field.created_at) %></td>
+            <td class="buttons">
+              <%= link_to edit_admin_calculated_custom_field_path(calc_field),
+                          class: 'icon icon-edit',
+                          title: t(:button_edit) do %>
+                <%= t(:button_edit) %>
+              <% end %>
+              <%= link_to admin_calculated_custom_field_path(calc_field),
+                          method: :delete,
+                          data: { confirm: t(:text_are_you_sure) },
+                          class: 'icon icon-delete',
+                          title: t(:button_delete) do %>
+                <%= t(:button_delete) %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% if @calculated_custom_fields.empty? %>
+  <div class="generic-table--empty-row">
+    <h3 class="generic-table--empty-row--description">
+      <%= t(:label_no_calculated_fields) %>
+    </h3>
+    <%= link_to new_admin_calculated_custom_field_path,
+                class: 'button -highlight -with-icon icon-add' do %>
+      <%= t(:label_new_calculated_field) %>
+    <% end %>
+  </div>
+<% end %>
+
+# File: plugins/openproject-calculated-fields/app/views/admin/calculated_custom_fields/_form.html.erb
+<%= error_messages_for @calculated_custom_field %>
+
+<div class="form--section">
+  <div class="form--field">
+    <%= f.select :custom_field_id,
+                 options_from_collection_for_select(@custom_fields, :id, :name, @calculated_custom_field.custom_field_id),
+                 { prompt: t(:label_select_custom_field) },
+                 { class: 'form--select', required: true } %>
+    <%= f.label :custom_field_id, t(:label_custom_field), class: 'form--label' %>
+  </div>
+
+  <div class="form--field">
+    <%= f.text_area :formula,
+                    rows: 5,
+                    class: 'form--text-area',
+                    placeholder: t(:label_formula_placeholder),
+                    required: true %>
+    <%= f.label :formula, t(:label_formula), class: 'form--label' %>
+    <div class="form--field-instructions">
+      <%= t(:text_formula_help) %>
+    </div>
+  </div>
+
+  <div class="form--field">
+    <%= f.select :output_type,
+                 options_for_select(CalculatedCustomField::OUTPUT_TYPES.map { |k, v| [v, k] }, @calculated_custom_field.output_type),
+                 {},
+                 { class: 'form--select', required: true } %>
+    <%= f.label :output_type, t(:label_output_type), class: 'form--label' %>
+  </div>
+
+  <div class="form--field">
+    <%= f.check_box :active, class: 'form--check-box' %>
+    <%= f.label :active, t(:field_active), class: 'form--label-with-check-box' %>
+  </div>
+</div>
+
+<div class="form--section">
+  <h3><%= t(:label_formula_preview) %></h3>
+  <div id="formula-preview">
+    <div class="form--field">
+      <select id="preview-work-package" class="form--select">
+        <option value=""><%= t(:label_select_work_package_for_preview) %></option>
+        <% WorkPackage.limit(10).each do |wp| %>
+          <option value="<%= wp.id %>"><%= "##{wp.id}: #{truncate(wp.subject, length: 50)}" %></option>
+        <% end %>
+      </select>
+      <label class="form--label"><%= t(:label_work_package_for_preview) %></label>
+    </div>
+    
+    <button type="button" id="preview-button" class="button -highlight">
+      <%= t(:button_preview) %>
+    </button>
+    
+    <div id="preview-result" class="form--field-instructions" style="margin-top: 10px;"></div>
+  </div>
+</div>
+
+<div class="form--section">
+  <h3><%= t(:label_available_functions) %></h3>
+  <div class="formula-help">
+    <ul>
+      <li><strong>CONCAT(text1, text2, ...)</strong> - <%= t(:text_concat_help) %></li>
+      <li><strong>IF(condition, true_value, false_value)</strong> - <%= t(:text_if_help) %></li>
+      <li><strong>LOWER(text)</strong> - <%= t(:text_lower_help) %></li>
+      <li><strong>UPPER(text)</strong> - <%= t(:text_upper_help) %></li>
+      <li><strong>LEN(text)</strong> - <%= t(:text_len_help) %></li>
+      <li><strong>TRIM(text)</strong> - <%= t(:text_trim_help) %></li>
+    </ul>
+    
+    <h4><%= t(:label_field_references) %></h4>
+    <ul>
+      <li><strong>{subject}</strong> - <%= t(:text_subject_field) %></li>
+      <li><strong>{status}</strong> - <%= t(:text_status_field) %></li>
+      <li><strong>{priority}</strong> - <%= t(:text_priority_field) %></li>
+      <li><strong>{assigned_to}</strong> - <%= t(:text_assigned_to_field) %></li>
+      <li><strong>{cf_123}</strong> - <%= t(:text_custom_field_reference) %></li>
+    </ul>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const previewButton = document.getElementById('preview-button');
+  const formulaField = document.querySelector('textarea[name="calculated_custom_field[formula]"]');
+  const outputTypeField = document.querySelector('select[name="calculated_custom_field[output_type]"]');
+  const workPackageSelect = document.getElementById('preview-work-package');
+  const previewResult = document.getElementById('preview-result');
+
+  previewButton.addEventListener('click', function() {
+    const formula = formulaField.value;
+    const outputType = outputTypeField.value;
+    const workPackageId = workPackageSelect.value;
+
+    if (!formula || !workPackageId) {
+      previewResult.innerHTML = '<span style="color: red;">Please enter a formula and select a work package</span>';
+      return;
+    }
+
+    previewResult.innerHTML = 'Loading...';
+
+    fetch('<%= admin_calculated_custom_fields_preview_path %>', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+      },
+      body: JSON.stringify({
+        formula: formula,
+        output_type: outputType,
+        work_package_id: workPackageId
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        previewResult.innerHTML = `<strong>Result:</strong> <code>${data.result}</code>`;
+      } else {
+        previewResult.innerHTML = `<span style="color: red;">Error: ${data.error}</span>`;
+      }
+    })
+    .catch(error => {
+      previewResult.innerHTML = `<span style="color: red;">Network error: ${error.message}</span>`;
+    });
+  });
+});
+</script>

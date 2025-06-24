@@ -1,0 +1,31 @@
+en:
+  label_calculated_custom_fields: "Calculated Custom Fields"
+  label_new_calculated_field: "New Calculated Field"
+  label_no_calculated_fields: "No calculated fields have been defined yet."
+  label_formula: "Formula"
+  label_output_type: "Output Type"
+  label_custom_field: "Custom Field"
+  label_formula_placeholder: 'Example: CONCAT({subject}, " - ", {status})'
+  label_formula_preview: "Formula Preview"
+  label_work_package_for_preview: "Work Package for Preview"
+  label_select_work_package_for_preview: "Select a work package to preview the formula"
+  label_select_custom_field: "Select Custom Field"
+  label_available_functions: "Available Functions"
+  label_field_references: "Field References"
+  
+  text_formula_help: |
+    Use functions like CONCAT, IF, LOWER, UPPER, LEN, TRIM.
+    Reference fields with {field_name} or {cf_123} for custom fields.
+  text_concat_help: "Concatenates text values"
+  text_if_help: "Returns different values based on condition"
+  text_lower_help: "Converts text to lowercase"
+  text_upper_help: "Converts text to uppercase"
+  text_len_help: "Returns the length of text"
+  text_trim_help: "Removes leading and trailing spaces"
+  text_subject_field: "Work package subject"
+  text_status_field: "Work package status"
+  text_priority_field: "Work package priority"
+  text_assigned_to_field: "Assigned user name"
+  text_custom_field_reference: "Custom field by ID (replace 123 with actual ID)"
+  
+  button_preview: "Preview"
